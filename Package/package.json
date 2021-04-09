@@ -1,0 +1,7 @@
+{
+  "name": "com.utj.lanmatching",
+  "displayName": "LAN Matching System",
+  "description": "Matching System for Local Area Network.",
+  "version": "1.0.0",
+  "unity": "2019.3"
+}
