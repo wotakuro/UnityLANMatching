@@ -11,5 +11,15 @@ namespace LANMatching
         public RoomInfo roomInfo;
         public IPEndPoint connectPoint;
         public double lastRecieved;
+        public bool isNew;
+        
+        public HostRoomInfo(IPEndPoint ipEndPoint, byte[] buffer,int index)
+        {
+            this.roomInfo = new RoomInfo();
+            this.roomInfo.ReadFromByteArray(buffer, index);
+            this.lastRecieved = Time.realtimeSinceStartupAsDouble;
+            this.isNew = true;
+            this.connectPoint = new IPEndPoint(ipEndPoint.Address, this.roomInfo.port);
+        }
     }
 }

@@ -9,11 +9,20 @@ namespace LANMatching
 {
     public class LANRoomManager : MonoBehaviour
     {
+        public enum RunningStatus
+        {
+            None,
+            HostRoom,
+            SearchRoom,
+        }
+
         [SerializeField]
         private int udpPacketPort = 9999;
         [SerializeField]
-        private int broadCastSpanMs = 1000;
-        
+        private int broadCastSpanMs = 500;
+        [SerializeField]
+        private int timeoutMs = 1500;
+
         private byte[] buffer = new byte[1024];
         private int bufferSize;
 
@@ -21,14 +30,44 @@ namespace LANMatching
         private bool executeFlag;
         private bool shouldCallRecieveAsync = true;
 
-        private Dictionary<EndPoint, HostRoomInfo> seachedRooms;
+        private Dictionary<EndPoint, HostRoomInfo> recievedRoomDictionary;
+        private List<HostRoomInfo> roomBuffer;
 
         public RoomInfo hostRoomInfo { get; set; }
-        public static LANRoomManager Instance
+
+        public RunningStatus status
         {
             get; private set;
         }
 
+
+        public static LANRoomManager Instance
+        {
+            get;
+            private set;
+        }
+
+
+        public List<HostRoomInfo> searchedRooms
+        {
+            get
+            {
+                if (this.roomBuffer == null) { this.roomBuffer = new List<HostRoomInfo>(); }
+                this.roomBuffer.Clear();
+                if(this.recievedRoomDictionary == null)
+                {
+                    return roomBuffer;
+                }
+                lock (recievedRoomDictionary)
+                {
+                    foreach (var kvs in this.recievedRoomDictionary)
+                    {
+                        this.roomBuffer.Add(kvs.Value);
+                    }
+                }
+                return this.roomBuffer;
+            }
+        }
 
         private void Awake()
         {
@@ -38,7 +77,7 @@ namespace LANMatching
 
             DontDestroyOnLoad(this.gameObject);
             this.executeFlag = false;
-            this.seachedRooms = new Dictionary<EndPoint, HostRoomInfo>();
+            this.status = RunningStatus.None;
         }
         private void OnDestroy()
         {
@@ -46,17 +85,38 @@ namespace LANMatching
             Instance = null;
         }
 
-        // Debug
-        private void Start()
+        private void Update()
         {
-            StartHostThread();
-            StartClientThread();
+            if (recievedRoomDictionary == null)
+            {
+                return;
+            }
+            double currentTime = Time.realtimeSinceStartupAsDouble;
+            lock (this.recievedRoomDictionary)
+            {
+                foreach( var kvs in recievedRoomDictionary)
+                {
+                    if( kvs.Value.isNew ){
+                        // Callback
+                        kvs.Value.isNew = false;
+                        continue;
+                    }
+                    // Timeout or close
+                    if( kvs.Value.lastRecieved - currentTime > timeoutMs / 1000.0 || 
+                        !kvs.Value.roomInfo.isOpen )
+                    {
+                        recievedRoomDictionary.Remove(kvs.Key);
+                    }
+                }
+            }
         }
+
 
         public void StartHostThread()
         {
             if (thread == null)
             {
+                this.status = RunningStatus.HostRoom;
                 this.executeFlag = true;
                 thread = new Thread(ExecuteHostThreaded);
                 thread.Name = "LANHostThread";
@@ -69,7 +129,13 @@ namespace LANMatching
         }
         public void StartClientThread()
         {
+            if (thread == null)
             {
+                if (this.recievedRoomDictionary == null)
+                {
+                    this.recievedRoomDictionary = new Dictionary<EndPoint, HostRoomInfo>();
+                }
+                this.status = RunningStatus.SearchRoom;
                 this.executeFlag = true;
                 thread = new Thread(ExecuteSearchRoomThreaded);
                 thread.Name = "LANClientThread";
@@ -87,6 +153,8 @@ namespace LANMatching
             {
                 SendBroadCastLoop(socket, remote);
             }
+            this.thread = null;
+            this.status = RunningStatus.None;
         }
 
         private void SendBroadCastLoop(Socket socket, IPEndPoint sendTo)
@@ -113,6 +181,8 @@ namespace LANMatching
             {
                 RecieveBroadCastLoop(socket, ipEndPoint);
             }
+            this.thread = null;
+            this.status = RunningStatus.None;
         }
         private void RecieveBroadCastLoop(Socket socket, IPEndPoint recieveFrom)
         {
@@ -139,14 +209,20 @@ namespace LANMatching
             HostRoomInfo info = null;
             var endPoint = evt.RemoteEndPoint;
             var ipEndPoint = endPoint as IPEndPoint;
-            if(!this.seachedRooms.TryGetValue(endPoint,out info))
+
+            lock (recievedRoomDictionary)
             {
-                info = new HostRoomInfo();
-                info.connectPoint = new IPEndPoint(ipEndPoint.Address, ipEndPoint.Port);
-                this.seachedRooms.Add(endPoint, info);
+                if (!this.recievedRoomDictionary.TryGetValue(endPoint, out info))
+                {
+                    info = new HostRoomInfo(ipEndPoint,evt.Buffer,0);
+                    this.recievedRoomDictionary.Add(endPoint, info);
+                }
+                else
+                {
+                    info.lastRecieved = Time.realtimeSinceStartupAsDouble;
+                    info.roomInfo.ReadFromByteArray(evt.Buffer, 0);
+                }
             }
-            info.roomInfo.ReadFromByteArray(evt.Buffer, 0);
-            info.connectPoint.Port = info.roomInfo.port;
             shouldCallRecieveAsync = true;            
         }
 
@@ -155,7 +231,6 @@ namespace LANMatching
         public void Stop()
         {
             this.executeFlag = false;
-            this.thread = null;
         }
     }
 
