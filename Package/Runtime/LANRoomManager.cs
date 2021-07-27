@@ -40,6 +40,10 @@ namespace LANMatching
             get; private set;
         }
 
+        public delegate void RoomEvent (HostRoomInfo info);
+
+        public RoomEvent OnFindNewRoom { get; set; }
+        public RoomEvent OnLoseRoom { get; set; }
 
         public static LANRoomManager Instance
         {
@@ -68,49 +72,6 @@ namespace LANMatching
                 return this.roomBuffer;
             }
         }
-
-        private void Awake()
-        {
-            Instance = this;
-            this.hostRoomInfo = new RoomInfo();
-            this.hostRoomInfo.name = SystemInfo.deviceName;
-
-            DontDestroyOnLoad(this.gameObject);
-            this.executeFlag = false;
-            this.status = RunningStatus.None;
-        }
-        private void OnDestroy()
-        {
-            this.Stop();
-            Instance = null;
-        }
-
-        private void Update()
-        {
-            if (recievedRoomDictionary == null)
-            {
-                return;
-            }
-            double currentTime = Time.realtimeSinceStartupAsDouble;
-            lock (this.recievedRoomDictionary)
-            {
-                foreach( var kvs in recievedRoomDictionary)
-                {
-                    if( kvs.Value.isNew ){
-                        // Callback
-                        kvs.Value.isNew = false;
-                        continue;
-                    }
-                    // Timeout or close
-                    if( kvs.Value.lastRecieved - currentTime > timeoutMs / 1000.0 || 
-                        !kvs.Value.roomInfo.isOpen )
-                    {
-                        recievedRoomDictionary.Remove(kvs.Key);
-                    }
-                }
-            }
-        }
-
 
         public void StartHostThread()
         {
@@ -142,6 +103,56 @@ namespace LANMatching
                 thread.Start();
             }
         }
+
+        #region UNITY_EVENTS
+        private void Awake()
+        {
+            Instance = this;
+            this.hostRoomInfo = new RoomInfo();
+            this.hostRoomInfo.name = SystemInfo.deviceName;
+
+            DontDestroyOnLoad(this.gameObject);
+            this.executeFlag = false;
+            this.status = RunningStatus.None;
+        }
+        private void OnDestroy()
+        {
+            this.Stop();
+            Instance = null;
+        }
+
+        private void Update()
+        {
+            if (recievedRoomDictionary == null)
+            {
+                return;
+            }
+            double currentTime = Time.realtimeSinceStartupAsDouble;
+            lock (this.recievedRoomDictionary)
+            {
+                foreach (var kvs in recievedRoomDictionary)
+                {
+                    if (kvs.Value.isNew)
+                    {
+                        // Callback
+                        kvs.Value.isNew = false;
+                        OnFindNewRoom?.Invoke(kvs.Value);
+                        continue;
+                    }
+                    // Timeout or close
+                    if (kvs.Value.lastRecieved - currentTime > timeoutMs / 1000.0 ||
+                        !kvs.Value.roomInfo.isOpen)
+                    {
+                        OnLoseRoom?.Invoke(kvs.Value);
+                        recievedRoomDictionary.Remove(kvs.Key);
+                    }
+                }
+            }
+        }
+        #endregion UNITY_EVENTS
+
+
+
 
         #region HOST_LOGIC
         private void ExecuteHostThreaded()

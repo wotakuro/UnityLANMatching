@@ -25,17 +25,24 @@ namespace LANMatching.Sample
         // Start is called before the first frame update
         private void OnEnable()
         {
+            LANRoomManager.Instance.OnFindNewRoom = OnFindNewRoom;
+            LANRoomManager.Instance.OnLoseRoom = OnLoseRoom;
             LANRoomManager.Instance.StartClientThread();
         }
         private void OnDisable()
         {
+            LANRoomManager.Instance.OnFindNewRoom = null;
+            LANRoomManager.Instance.OnLoseRoom = null;
             LANRoomManager.Instance.Stop();
         }
 
-        // Update is called once per frame
-        void Update()
+        private void OnFindNewRoom(HostRoomInfo info)
         {
-
         }
+
+        private void OnLoseRoom(HostRoomInfo info)
+        {
+        }
+
     }
 }

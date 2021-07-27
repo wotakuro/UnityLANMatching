@@ -25,22 +25,24 @@ namespace LANMatching.Sample
 
         void Awake()
         {
-            searchRoomBtn.onClick.AddListener(this.OnClickSerchRoom);
-            createRoomBtn.onClick.AddListener(this.OnClickHostRoom);
-            playerNameField.text = SystemInfo.deviceName;
-            roomNameField.text = SystemInfo.deviceName;
+            this.searchRoomBtn.onClick.AddListener(this.OnClickSerchRoom);
+            this.createRoomBtn.onClick.AddListener(this.OnClickHostRoom);
+            this.playerNameField.text = SystemInfo.deviceName;
+            this.roomNameField.text = SystemInfo.deviceName;
         }
 
         void OnClickSerchRoom()
         {
-            roomSearchUI.SetUp( this);
-            roomSearchUI.gameObject.SetActive(true);
+            this.roomSearchUI.SetUp( this);
+            this.roomSearchUI.gameObject.SetActive(true);
+            this.gameObject.SetActive(false);
         }
 
         void OnClickHostRoom()
         {
-            roomHostUI.SetUp(this , this.roomNameField.text );
-            roomHostUI.gameObject.SetActive(true);
+            this.roomHostUI.SetUp(this , this.roomNameField.text );
+            this.roomHostUI.gameObject.SetActive(true);
+            this.gameObject.SetActive(false);
         }
 
     }
