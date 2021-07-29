@@ -16,12 +16,23 @@ namespace LANMatching
             SearchRoom,
         }
 
+        public enum BroadcastMethod
+        {
+            IPv4 = 0,
+            IPv6 = 1,
+        }
+
         [SerializeField]
         private int udpPacketPort = 9999;
         [SerializeField]
         private int broadCastSpanMs = 500;
         [SerializeField]
         private int timeoutMs = 1500;
+
+        // ipv6 is not yet
+        [SerializeField]
+        [HideInInspector]
+        private BroadcastMethod method = BroadcastMethod.IPv4;
 
         private byte[] buffer = new byte[1024];
         private int bufferSize;
@@ -32,6 +43,9 @@ namespace LANMatching
 
         private Dictionary<EndPoint, HostRoomInfo> recievedRoomDictionary;
         private List<HostRoomInfo> roomBuffer;
+        private List<EndPoint> keyBuffer;
+
+        internal static double currentTime;
 
         public RoomInfo hostRoomInfo { get; set; }
 
@@ -44,6 +58,7 @@ namespace LANMatching
 
         public RoomEvent OnFindNewRoom { get; set; }
         public RoomEvent OnLoseRoom { get; set; }
+        public RoomEvent OnChangeRoom { get; set; }
 
         public static LANRoomManager Instance
         {
@@ -123,11 +138,15 @@ namespace LANMatching
 
         private void Update()
         {
+            currentTime = Time.realtimeSinceStartupAsDouble;
             if (recievedRoomDictionary == null)
             {
                 return;
             }
-            double currentTime = Time.realtimeSinceStartupAsDouble;
+            if(keyBuffer == null)
+            {
+                keyBuffer = new List<EndPoint>();
+            }
             lock (this.recievedRoomDictionary)
             {
                 foreach (var kvs in recievedRoomDictionary)
@@ -135,17 +154,30 @@ namespace LANMatching
                     if (kvs.Value.isNew)
                     {
                         // Callback
-                        kvs.Value.isNew = false;
+                        kvs.Value.UpdateFlags();
                         OnFindNewRoom?.Invoke(kvs.Value);
                         continue;
                     }
                     // Timeout or close
-                    if (kvs.Value.lastRecieved - currentTime > timeoutMs / 1000.0 ||
+                    else if (currentTime - kvs.Value.lastRecieved > timeoutMs / 1000.0 ||
                         !kvs.Value.roomInfo.isOpen)
                     {
+                        Debug.Log("Room Closed " + kvs.Value.roomInfo.isOpen + "::" +
+                            kvs.Value.lastRecieved + "::" +currentTime);
+                        keyBuffer.Add(kvs.Key);
                         OnLoseRoom?.Invoke(kvs.Value);
-                        recievedRoomDictionary.Remove(kvs.Key);
                     }
+                    // information changed
+                    else if (kvs.Value.isChanged)
+                    {
+                        kvs.Value.UpdateFlags();
+                        OnChangeRoom?.Invoke(kvs.Value);
+                    }
+                }
+                // Remove Room info
+                foreach( var key in keyBuffer)
+                {
+                    recievedRoomDictionary.Remove(key);
                 }
             }
         }
@@ -178,8 +210,26 @@ namespace LANMatching
             {
                 this.bufferSize = this.hostRoomInfo.WriteToByteArray(buffer);
                 socket.SendTo(this.buffer, 0, this.bufferSize, SocketFlags.None, sendTo);
-                Thread.Sleep(broadCastSpanMs);
+                for (int left = broadCastSpanMs; left > 0;)
+                {
+                    if (!executeFlag) { break; }
+                    if (left > 10)
+                    {
+                        Thread.Sleep(10);
+                    }
+                    else
+                    {
+                        Thread.Sleep(left);
+                    }
+                    left -= 10;
+                }
             }
+            // close info send
+            this.hostRoomInfo.isOpen = false;
+            this.bufferSize = this.hostRoomInfo.WriteToByteArray(buffer);
+            socket.SendTo(this.buffer, 0, this.bufferSize, SocketFlags.None, sendTo);
+            // and back to normal
+            this.hostRoomInfo.isOpen = false;
         }
         #endregion HOST_LOGIC
 
@@ -220,6 +270,7 @@ namespace LANMatching
             HostRoomInfo info = null;
             var endPoint = evt.RemoteEndPoint;
             var ipEndPoint = endPoint as IPEndPoint;
+            
 
             lock (recievedRoomDictionary)
             {
@@ -230,10 +281,11 @@ namespace LANMatching
                 }
                 else
                 {
-                    info.lastRecieved = Time.realtimeSinceStartupAsDouble;
+                    info.UpdateRecievedTime();
                     info.roomInfo.ReadFromByteArray(evt.Buffer, 0);
                 }
             }
+
             shouldCallRecieveAsync = true;            
         }
 

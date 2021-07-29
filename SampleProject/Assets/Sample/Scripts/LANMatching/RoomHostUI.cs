@@ -18,37 +18,45 @@ namespace LANMatching.Sample
         private InformationInputUI inputUI;
 
 
-        public void SetUp(InformationInputUI ui,string name)
+        public void Setup(InformationInputUI ui,string name)
         {
             this.roomName = name;
             this.inputUI = ui;
         }
 
-
-        // Start is called before the first frame update
-        void Awake()
+        private void Awake()
         {
-
+            this.backButton.onClick.AddListener(this.OnBackButton);
+            this.startGameButton.onClick.AddListener(this.OnStartGameButton);
         }
 
         private void OnEnable()
         {
-            var roomInfo = new RoomInfo(this.roomName, 12000, 4);
+            var mlapiTransport = MLAPI.NetworkManager.Singleton.NetworkConfig.NetworkTransport as MLAPI.Transports.UNET.UNetTransport;
+            int port = mlapiTransport.ServerListenPort; ;
+
+
+            var roomInfo = new RoomInfo(this.roomName,port , 4);
             LANRoomManager.Instance.hostRoomInfo = roomInfo;
             LANRoomManager.Instance.StartHostThread();
         }
         private void OnDisable()
         {
-            LANRoomManager.Instance.Stop();
+            if (LANRoomManager.Instance)
+            {
+                LANRoomManager.Instance.Stop();
+            }
         }
 
 
         private void OnBackButton()
         {
+            this.gameObject.SetActive(false);
+            this.inputUI.gameObject.SetActive(true);
         }
         private void OnStartGameButton()
         {
-            LANRoomManager.Instance.StartHostThread();
+            LANRoomManager.Instance.Stop();
         }
     }
 }

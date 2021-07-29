@@ -6,7 +6,6 @@ using UTJ.MLAPISample;
 
 namespace UTJ.MLAPISample
 {
-    [NetworkUtility.RequireAtHeadless]
     public class ControllerBehaviour : MonoBehaviour
     {
         private class ButtonListner
@@ -89,13 +88,6 @@ namespace UTJ.MLAPISample
             get
             {
                 Vector3 move;
-                // 自動入力時の処理
-#if ENABLE_AUTO_CLIENT
-                if (NetworkUtility.IsBatchModeRun)
-                {
-                    return CalculateActualMoveVector(this.dummyInputStick);
-                }
-#endif
                 if (isTouching)
                 {
                     var delta = this.currentPos - this.touchedPos;
@@ -165,10 +157,6 @@ namespace UTJ.MLAPISample
         {
             this.UpdateTouchPos();
             this.UpdateLeftStickPosition();
-            // バッチモード時のダミー移動処理
-#if ENABLE_AUTO_CLIENT
-            UpdateDummyInput();
-#endif
         }
 
         // 左側のスティックの更新
@@ -239,37 +227,6 @@ namespace UTJ.MLAPISample
             return false;
         }
 
-
-        // バッチビルドのダミー用
-#if ENABLE_AUTO_CLIENT
-
-        private float dummyInputStickTimer;
-        private float dummyInputVoiceTimer;
-        private Vector3 dummyInputStick;
-
-        private void UpdateDummyInput()
-        {
-            if (!NetworkUtility.IsBatchModeRun)
-            {
-                return;
-            }
-
-            if (dummyInputStickTimer <= 0.0f)
-            {
-                float rand = UnityEngine.Random.Range(-Mathf.PI, Mathf.PI);
-                dummyInputStick = new Vector3(Mathf.Cos(rand), 0.0f, Mathf.Sign(rand));
-                dummyInputStickTimer = UnityEngine.Random.Range(1.0f, 4.0f);
-            }
-            dummyInputStickTimer -= Time.deltaTime;
-
-            if (dummyInputVoiceTimer < 0.0f)
-            {
-                dummyInputVoiceTimer = UnityEngine.Random.Range(5.0f, 20.0f);
-                this.OnClickBtn(UnityEngine.Random.Range(0, 4));
-            }
-            dummyInputVoiceTimer -= Time.deltaTime;
-        }
-#endif
 
 
     }

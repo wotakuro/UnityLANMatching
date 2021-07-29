@@ -33,14 +33,14 @@ namespace LANMatching.Sample
 
         void OnClickSerchRoom()
         {
-            this.roomSearchUI.SetUp( this);
+            this.roomSearchUI.Setup( this);
             this.roomSearchUI.gameObject.SetActive(true);
             this.gameObject.SetActive(false);
         }
 
         void OnClickHostRoom()
         {
-            this.roomHostUI.SetUp(this , this.roomNameField.text );
+            this.roomHostUI.Setup(this , this.roomNameField.text );
             this.roomHostUI.gameObject.SetActive(true);
             this.gameObject.SetActive(false);
         }

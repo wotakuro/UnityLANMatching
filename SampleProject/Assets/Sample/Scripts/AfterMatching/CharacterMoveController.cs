@@ -37,22 +37,11 @@ namespace UTJ.MLAPISample
             // Player名が変更になった時のコールバック指定
             this.playerName.OnValueChanged += OnChangePlayerName;
 
-            // あとServer時に余計なものを削除します
-#if UNITY_SERVER
-            NetworkUtility.RemoveAllStandaloneComponents(this.gameObject);
-#elif ENABLE_AUTO_CLIENT
-            if (NetworkUtility.IsBatchModeRun)
-            {
-                NetworkUtility.RemoveAllStandaloneComponents(this.gameObject);
-            }
-#endif
         }
         private void Start()
         {
             if (IsOwner)
             {
-                // プレイヤー名をセットします
-                this.playerName.Value = ConfigureConnectionBehaviour.playerName;
                 // コントローラーの有効化をします
                 ControllerBehaviour.Instance.Enable();
             }

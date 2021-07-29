@@ -39,15 +39,17 @@ namespace LANMatching
         public RoomInfo()
         {
             this.port = 11111;
+            this.isOpen = true;
         }
         public RoomInfo(string n, int p, byte cap)
         {
             this.name = n;
             this.port = p;
             this.capacity = cap;
+            this.isOpen = true;
         }
 
-        public int WriteToByteArray(byte[] data)
+        internal int WriteToByteArray(byte[] data)
         {
             if (isOpen)
             {
@@ -74,8 +76,11 @@ namespace LANMatching
             }
             return 9 + this.nameByteNum;
         }
-        public void ReadFromByteArray(byte[] data, int idx)
+
+        internal bool ReadFromByteArray(byte[] data, int idx)
         {
+            bool isChanged = false;
+            bool prevIsOpen = this.isOpen;
             if (data[idx + 0] == 0)
             {
                 this.isOpen = false;
@@ -84,13 +89,19 @@ namespace LANMatching
             {
                 this.isOpen = true;
             }
+            if(this.isOpen != prevIsOpen) { isChanged = true; }
+            if (this.capacity != data[idx + 1]) { isChanged = true; }
+            if (this.currentUser != data[idx + 2]) { isChanged = true; }
+
             this.capacity = data[idx + 1];
             this.currentUser = data[idx + 2];
             int dataNum = data[idx + 7] + (data[idx + 8] << 8);
             if (!SetRawByts(dataNum, data, idx + 9))
             {
                 this.nameStr = System.Text.Encoding.UTF8.GetString(this.rawNameBin, 0, this.nameByteNum);
+                isChanged = true;
             }
+            return isChanged;
         }
 
         private bool SetRawByts(int dataNum, byte[] data, int idx)
