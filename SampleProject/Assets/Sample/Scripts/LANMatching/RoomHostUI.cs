@@ -30,15 +30,29 @@ namespace LANMatching.Sample
             this.startGameButton.onClick.AddListener(this.OnStartGameButton);
         }
 
+        private void Update()
+        {
+            // update current user num
+            int userNum = MLAPI.NetworkManager.Singleton.ConnectedClientsList.Count;
+            LANRoomManager.Instance.hostRoomInfo.currentUser = (byte)(userNum);
+        }
+
         private void OnEnable()
         {
             var mlapiTransport = MLAPI.NetworkManager.Singleton.NetworkConfig.NetworkTransport as MLAPI.Transports.UNET.UNetTransport;
             int port = mlapiTransport.ServerListenPort; ;
+            int limitUser= mlapiTransport.MaxConnections;
 
-
-            var roomInfo = new RoomInfo(this.roomName,port , 4);
+            var roomInfo = new RoomInfo(this.roomName,port , (byte)limitUser);
             LANRoomManager.Instance.hostRoomInfo = roomInfo;
             LANRoomManager.Instance.StartHostThread();
+
+            // Start MLAPI Host
+            MLAPI.NetworkManager.Singleton.OnClientConnectedCallback += (evt) =>
+            {
+                Debug.Log("OnConnectClient " + evt);
+            };
+            MLAPI.NetworkManager.Singleton.StartHost();
         }
         private void OnDisable()
         {
@@ -53,6 +67,7 @@ namespace LANMatching.Sample
         {
             this.gameObject.SetActive(false);
             this.inputUI.gameObject.SetActive(true);
+            MLAPI.NetworkManager.Singleton.StopHost();
         }
         private void OnStartGameButton()
         {

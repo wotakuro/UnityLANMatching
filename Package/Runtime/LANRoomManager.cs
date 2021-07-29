@@ -56,9 +56,9 @@ namespace LANMatching
 
         public delegate void RoomEvent (HostRoomInfo info);
 
-        public RoomEvent OnFindNewRoom { get; set; }
-        public RoomEvent OnLoseRoom { get; set; }
-        public RoomEvent OnChangeRoom { get; set; }
+        public RoomEvent OnFindNewRoom { private get; set; }
+        public RoomEvent OnLoseRoom { private get; set; }
+        public RoomEvent OnChangeRoom { private get; set; }
 
         public static LANRoomManager Instance
         {
@@ -192,6 +192,7 @@ namespace LANMatching
             var remote = new IPEndPoint(
                                 IPAddress.Broadcast,
                                 this.udpPacketPort);
+
             using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
                 SendBroadCastLoop(socket, remote);
@@ -237,10 +238,22 @@ namespace LANMatching
         #region CLIENT_LOGIC
         private void ExecuteSearchRoomThreaded()
         {
-            var ipEndPoint = new IPEndPoint(IPAddress.Any, udpPacketPort);
-            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            bool flag = true;
+            while (flag)
             {
-                RecieveBroadCastLoop(socket, ipEndPoint);
+                try
+                {
+                    var ipEndPoint = new IPEndPoint(IPAddress.Any, udpPacketPort);
+                    using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+                    {
+                        RecieveBroadCastLoop(socket, ipEndPoint);
+                        flag = false;
+                    }
+                }
+                catch (System.Net.Sockets.SocketException e)
+                {
+                    Thread.Sleep(1000);
+                }
             }
             this.thread = null;
             this.status = RunningStatus.None;

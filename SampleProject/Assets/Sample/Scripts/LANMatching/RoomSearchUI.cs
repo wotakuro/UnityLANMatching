@@ -54,12 +54,19 @@ namespace LANMatching.Sample
         {
             var obj = GameObject.Instantiate(this.selectButtonPrefab, this.scrollRect.transform);
             var selectBtn = obj.GetComponent<RoomSelectButton>();
-            selectBtn.Setup(info);
+            selectBtn.Setup(this,info);
             this.roomSelectButtons.Add(selectBtn);
         }
 
         private void OnChangeNewRoom(HostRoomInfo info)
         {
+            foreach( var roomBtn in this.roomSelectButtons)
+            {
+                if(roomBtn.IsSameHostRoom(info) ){
+                    roomBtn.Setup(this, info);
+                    break;
+                }
+            }
         }
 
         private void OnLoseRoom(HostRoomInfo info)
@@ -81,6 +88,20 @@ namespace LANMatching.Sample
             this.gameObject.SetActive(false);
             this.inputUI.gameObject.SetActive(true);
         }
+
+        internal void OnClickRoomButton(HostRoomInfo roomInfo)
+        {
+            // Connect to MLAPI
+            var netMgr = MLAPI.NetworkManager.Singleton;
+            var transport = netMgr.NetworkConfig.NetworkTransport as MLAPI.Transports.UNET.UNetTransport;
+            transport.ConnectPort = roomInfo.connectPoint.Port;
+            transport.ConnectAddress = roomInfo.connectPoint.Address.ToString();
+            Debug.Log(transport.ConnectAddress);
+            netMgr.StartClient();
+            this.gameObject.SetActive(false);
+        }
+
+
 
     }
 }

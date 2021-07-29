@@ -3392,7 +3392,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MessageBufferSize: 5120
-  MaxConnections: 100
+  MaxConnections: 4
   MaxSentMessageQueueSize: 128
   ConnectAddress: 127.0.0.1
   ConnectPort: 7777
@@ -3424,6 +3424,7 @@ MonoBehaviour:
     NetworkTransport: {fileID: 1874749282}
     RegisteredScenes:
     - LanMatching
+    - AfterMatching
     AllowRuntimeSceneChanges: 1
     NetworkPrefabs: []
     PlayerPrefabHash:
