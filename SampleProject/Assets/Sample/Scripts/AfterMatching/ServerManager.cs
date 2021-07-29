@@ -98,7 +98,6 @@ namespace UTJ.MLAPISample
         // サーバー開始時の処理
         private void OnStartServer()
         {
-            Debug.Log("Start Server");
             var clientId = MLAPI.NetworkManager.Singleton.ServerClientId;
             // hostならば生成します
             if (MLAPI.NetworkManager.Singleton.IsHost)

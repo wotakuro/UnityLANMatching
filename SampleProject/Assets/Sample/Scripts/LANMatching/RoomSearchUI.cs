@@ -13,7 +13,7 @@ namespace LANMatching.Sample
         private Button backButton;
         [SerializeField]
         private GameObject selectButtonPrefab;
-
+        
 
         private InformationInputUI inputUI;
 
@@ -96,9 +96,13 @@ namespace LANMatching.Sample
             var transport = netMgr.NetworkConfig.NetworkTransport as MLAPI.Transports.UNET.UNetTransport;
             transport.ConnectPort = roomInfo.connectPoint.Port;
             transport.ConnectAddress = roomInfo.connectPoint.Address.ToString();
-            Debug.Log(transport.ConnectAddress);
+            //            Debug.Log(transport.ConnectAddress);
+            netMgr.OnClientConnectedCallback += OnStartClient;
             netMgr.StartClient();
             this.gameObject.SetActive(false);
+        }
+        void OnStartClient(ulong clientId)
+        {
         }
 
 

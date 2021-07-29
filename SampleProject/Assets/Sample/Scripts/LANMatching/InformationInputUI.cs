@@ -7,6 +7,7 @@ namespace LANMatching.Sample
 {
     public class InformationInputUI : MonoBehaviour
     {
+        public static string playerName;
         [SerializeField]
         private InputField playerNameField;
         [SerializeField]
@@ -33,6 +34,7 @@ namespace LANMatching.Sample
 
         void OnClickSerchRoom()
         {
+            playerName = this.playerNameField.text;
             this.roomSearchUI.Setup( this);
             this.roomSearchUI.gameObject.SetActive(true);
             this.gameObject.SetActive(false);
@@ -40,6 +42,7 @@ namespace LANMatching.Sample
 
         void OnClickHostRoom()
         {
+            playerName = this.playerNameField.text;
             this.roomHostUI.Setup(this , this.roomNameField.text );
             this.roomHostUI.gameObject.SetActive(true);
             this.gameObject.SetActive(false);

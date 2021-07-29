@@ -13,6 +13,8 @@ namespace LANMatching.Sample
         private Button backButton;
         [SerializeField]
         private Button startGameButton;
+        [SerializeField]
+        private GameObject playerNameSyncPrefab;
 
         private string roomName;
         private InformationInputUI inputUI;
@@ -43,17 +45,30 @@ namespace LANMatching.Sample
             int port = mlapiTransport.ServerListenPort; ;
             int limitUser= mlapiTransport.MaxConnections;
 
+
             var roomInfo = new RoomInfo(this.roomName,port , (byte)limitUser);
             LANRoomManager.Instance.hostRoomInfo = roomInfo;
             LANRoomManager.Instance.StartHostThread();
 
             // Start MLAPI Host
-            MLAPI.NetworkManager.Singleton.OnClientConnectedCallback += (evt) =>
-            {
-                Debug.Log("OnConnectClient " + evt);
-            };
+            MLAPI.NetworkManager.Singleton.OnClientConnectedCallback += OnConnectClient;
+            MLAPI.NetworkManager.Singleton.OnClientDisconnectCallback += OnDisconnectClient;
             MLAPI.NetworkManager.Singleton.StartHost();
+
+            //
+            var syncBehaviour = GameObject.Instantiate(playerNameSyncPrefab).GetComponent<NetworkSettingSyncBehaviour>();
+            syncBehaviour.NetworkObject.Spawn();
         }
+
+        private void OnConnectClient(ulong clientID)
+        {
+            Debug.Log("OnConnectClient " + clientID);
+        }
+        private void OnDisconnectClient(ulong clientID)
+        {
+            Debug.Log("OnDisconnectClient " + clientID);
+        }
+
         private void OnDisable()
         {
             if (LANRoomManager.Instance)
@@ -72,6 +87,8 @@ namespace LANMatching.Sample
         private void OnStartGameButton()
         {
             LANRoomManager.Instance.Stop();
+            // シーンを移ります
+            MLAPI.SceneManagement.NetworkSceneManager.SwitchScene("AfterMatching");
         }
     }
 }

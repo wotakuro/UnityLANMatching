@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Sample/Scenes/LanMatching.unity
     guid: cbebb7f1d36acd94590d832214cb3966
-  - enabled: 0
+  - enabled: 1
     path: Assets/Sample/Scenes/AfterMatching.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   m_configObjects: {}

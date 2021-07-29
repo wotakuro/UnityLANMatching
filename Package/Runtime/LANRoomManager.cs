@@ -162,8 +162,6 @@ namespace LANMatching
                     else if (currentTime - kvs.Value.lastRecieved > timeoutMs / 1000.0 ||
                         !kvs.Value.roomInfo.isOpen)
                     {
-                        Debug.Log("Room Closed " + kvs.Value.roomInfo.isOpen + "::" +
-                            kvs.Value.lastRecieved + "::" +currentTime);
                         keyBuffer.Add(kvs.Key);
                         OnLoseRoom?.Invoke(kvs.Value);
                     }

@@ -95,6 +95,9 @@ namespace LANMatching
 
             this.capacity = data[idx + 1];
             this.currentUser = data[idx + 2];
+            this.port = (data[idx + 3] << 0) +(data[idx + 4] << 8 )+
+                (data[idx + 5] << 16 )+(data[idx + 6] << 24);
+
             int dataNum = data[idx + 7] + (data[idx + 8] << 8);
             if (!SetRawByts(dataNum, data, idx + 9))
             {
