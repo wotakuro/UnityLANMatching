@@ -28,7 +28,9 @@ namespace LANMatching.Sample
         {
             this.searchRoomBtn.onClick.AddListener(this.OnClickSerchRoom);
             this.createRoomBtn.onClick.AddListener(this.OnClickHostRoom);
+
             this.playerNameField.text = SystemInfo.deviceName;
+            this.playerNameField.text = System.Environment.UserName;
             this.roomNameField.text = SystemInfo.deviceName;
         }
 

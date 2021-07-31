@@ -12,11 +12,7 @@ namespace UTJ.MLAPISample
     {
 
         public TextMesh playerNameTextMesh;
-        public ParticleSystem soundPlayingParticle;
-        public AudioSource audioSouceComponent;
 
-
-        public AudioClip[] audios;
 
         private Rigidbody rigidbodyComponent;
         private Animator animatorComponent;
@@ -76,9 +72,6 @@ namespace UTJ.MLAPISample
         {
             // Animatorの速度更新(歩き・走り・静止などをSpeedでコントロールしてます)
             animatorComponent.SetFloat("Speed", speed.Value);
-            // 音量調整
-            this.audioSouceComponent.volume = SoundVolume.VoiceValue;
-
             // オーナーとして管理している場合、ここのUpdateを呼びます
             if (IsOwner)
             {
@@ -109,44 +102,9 @@ namespace UTJ.MLAPISample
                 transform.position = randomPosition;
             }
 
-            // キーを押して音を流します
-            for (int i = 0; i < this.audios.Length; ++i)
-            {
-                if (ControllerBehaviour.Instance.IsKeyDown(i))
-                {
-                    // 他の人に流してもらうために、サーバーにRPCします。
-                    PlayAudioRequestOnServerRpc(i);
-                }
-            }
             // 入力の通知を通知します
             ControllerBehaviour.Instance.OnUpdateEnd();
         }
 
-        // Clientからサーバーに呼び出されるRPCです。
-        [MLAPI.Messaging.ServerRpc(RequireOwnership = true)]
-        private void PlayAudioRequestOnServerRpc(int idx,ServerRpcParams serverRpcParams = default)
-        {
-            // PlayAudioを呼び出します
-            PlayAudioClientRpc(idx);
-//            InvokeClientRpcOnEveryoneExcept(PlayAudio, this.OwnerClientId, idx);
-        }
-
-        // 音を再生します。付随してParticleをPlayします
-        [MLAPI.Messaging.ClientRpc]
-        private void PlayAudioClientRpc(int idx,ClientRpcParams clientRpcParams = default)
-        {
-            PlayAudio(idx);
-        }
-        private void PlayAudio(int idx) { 
-            this.audioSouceComponent.clip = audios[idx];
-            this.audioSouceComponent.Play();
-
-            this.soundPlayingParticle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-
-            var mainModule = soundPlayingParticle.main;
-            mainModule.duration = audios[idx].length;
-
-            this.soundPlayingParticle.Play();
-        }
     }
 }
