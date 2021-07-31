@@ -13,7 +13,10 @@ namespace LANMatching.Sample
         private Button backButton;
         [SerializeField]
         private GameObject selectButtonPrefab;
-        
+
+        [SerializeField]
+        private WaitingOtherClientUI waitingOtherClientUI;
+
 
         private InformationInputUI inputUI;
 
@@ -91,6 +94,8 @@ namespace LANMatching.Sample
 
         internal void OnClickRoomButton(HostRoomInfo roomInfo)
         {
+            waitingOtherClientUI.Setup(this.inputUI);
+            waitingOtherClientUI.gameObject.SetActive(true);
             // Connect to MLAPI
             var netMgr = MLAPI.NetworkManager.Singleton;
             var transport = netMgr.NetworkConfig.NetworkTransport as MLAPI.Transports.UNET.UNetTransport;

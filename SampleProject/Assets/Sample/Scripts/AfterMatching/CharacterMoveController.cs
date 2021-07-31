@@ -36,7 +36,11 @@ namespace UTJ.MLAPISample
 
             // Player名が変更になった時のコールバック指定
             this.playerName.OnValueChanged += OnChangePlayerName;
+        }
 
+        public void SetPlayerName(string name)
+        {
+            playerName.Value = name;
         }
         private void Start()
         {

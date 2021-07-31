@@ -11,7 +11,13 @@ namespace LANMatching.Sample
     public class NetworkSettingSyncBehaviour : NetworkBehaviour
     {
         public static NetworkSettingSyncBehaviour Instance { get; private set; }
-        private Dictionary<ulong, string> playerNames = new Dictionary<ulong, string>();        
+        private Dictionary<ulong, string> playerNames = new Dictionary<ulong, string>();
+
+        public Dictionary<ulong,string> GetAllPlayers()
+        {
+            return this.playerNames;
+        }
+
 
         public void Awake()
         {
@@ -21,8 +27,10 @@ namespace LANMatching.Sample
 
         private void OnDestroy()
         {
-
-            NetworkManager.OnClientDisconnectCallback -= OnDisconnectClient;
+            if (NetworkManager.Singleton)
+            {
+                NetworkManager.Singleton.OnClientDisconnectCallback -= OnDisconnectClient;
+            }
             Instance = null;
         }
 
@@ -42,8 +50,8 @@ namespace LANMatching.Sample
         private void SetNameServerRpc(string name ,ServerRpcParams rpcParams=default)
         {
             ulong clientId = rpcParams.Receive.SenderClientId;
-            
-            playerNames[clientId] = name;
+
+            SetPlayerName(clientId, name);
             ClientRpcParams clientRpc = default;
             SetNameClientRpc(clientId, name,clientRpc);
         }
@@ -62,6 +70,11 @@ namespace LANMatching.Sample
 
         [ClientRpc(Delivery = RpcDelivery.Reliable)]
         private void SetNameClientRpc(ulong clientId, string name,ClientRpcParams rpcParams= default)
+        {
+            SetPlayerName(clientId, name);
+        }
+
+        private void SetPlayerName(ulong clientId , string name)
         {
             playerNames[clientId] = name;
         }

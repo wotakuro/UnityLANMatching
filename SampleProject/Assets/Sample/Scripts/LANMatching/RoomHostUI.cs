@@ -8,8 +8,6 @@ namespace LANMatching.Sample
     public class RoomHostUI : MonoBehaviour
     {
         [SerializeField]
-        private ScrollRect scrollRect;
-        [SerializeField]
         private Button backButton;
         [SerializeField]
         private Button startGameButton;
@@ -37,6 +35,7 @@ namespace LANMatching.Sample
             // update current user num
             int userNum = MLAPI.NetworkManager.Singleton.ConnectedClientsList.Count;
             LANRoomManager.Instance.hostRoomInfo.currentUser = (byte)(userNum);
+
         }
 
         private void OnEnable()
@@ -51,23 +50,14 @@ namespace LANMatching.Sample
             LANRoomManager.Instance.StartHostThread();
 
             // Start MLAPI Host
-            MLAPI.NetworkManager.Singleton.OnClientConnectedCallback += OnConnectClient;
-            MLAPI.NetworkManager.Singleton.OnClientDisconnectCallback += OnDisconnectClient;
             MLAPI.NetworkManager.Singleton.StartHost();
 
-            //
+            // Spawn SyncObject
             var syncBehaviour = GameObject.Instantiate(playerNameSyncPrefab).GetComponent<NetworkSettingSyncBehaviour>();
             syncBehaviour.NetworkObject.Spawn();
         }
 
-        private void OnConnectClient(ulong clientID)
-        {
-            Debug.Log("OnConnectClient " + clientID);
-        }
-        private void OnDisconnectClient(ulong clientID)
-        {
-            Debug.Log("OnDisconnectClient " + clientID);
-        }
+
 
         private void OnDisable()
         {

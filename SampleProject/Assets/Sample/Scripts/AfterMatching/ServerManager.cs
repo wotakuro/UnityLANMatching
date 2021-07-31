@@ -18,7 +18,6 @@ namespace UTJ.MLAPISample
         public Text serverInfoText;
 
         private MLAPI.Transports.Tasks.SocketTasks socketTasks;
-        private ConnectInfo cachedConnectInfo;
 
 
         public void SetSocketTasks(MLAPI.Transports.Tasks.SocketTasks tasks)
@@ -26,9 +25,8 @@ namespace UTJ.MLAPISample
             socketTasks = tasks;
         }
 
-        public void Setup(ConnectInfo connectInfo, string localIp)
+        public void Setup(string localIp)
         {
-            this.cachedConnectInfo = connectInfo;
             // サーバーとして起動したときのコールバック設定
             MLAPI.NetworkManager.Singleton.OnServerStarted += this.OnStartServer;
             // クライアントが接続された時のコールバック設定
@@ -36,19 +34,11 @@ namespace UTJ.MLAPISample
             // クライアントが切断された時のコールバック設定
             MLAPI.NetworkManager.Singleton.OnClientDisconnectCallback += this.OnClientDisconnect;
 
-            if (connectInfo.useRelay)
-            {
-                MLAPI.Transports.UNET.RelayTransport.OnRemoteEndpointReported += OnRelayEndPointReported;
-                this.serverInfoRoot.SetActive(true);
-                this.serverInfoText.text = "Relayサーバーに繋がっていません";
-            }
-            else
             {
                 var stringBuilder = new System.Text.StringBuilder(256);
                 this.serverInfoRoot.SetActive(true);
                 stringBuilder.Append("サーバー接続情報\n").
-                    Append("接続先IP:").Append(localIp).Append("\n").
-                    Append("Port番号:").Append(connectInfo.port);
+                    Append("接続先IP:").Append(localIp).Append("\n");
                 this.serverInfoText.text = stringBuilder.ToString();
             }
             // transportの初期化
@@ -61,9 +51,7 @@ namespace UTJ.MLAPISample
             this.serverInfoRoot.SetActive(true);
             stringBuilder.Append("サーバー接続情報\n").
                 Append("接続先IP:").Append(endPoint.Address.ToString()).Append("\n").
-                Append("Port番号:").Append(endPoint.Port).Append("\n").
-                Append("Relay IP:").Append(cachedConnectInfo.relayIpAddr).Append("\n").
-                Append("Relay Port:").Append(cachedConnectInfo.relayPort);
+                Append("Port番号:").Append(endPoint.Port).Append("\n");
             this.serverInfoText.text = stringBuilder.ToString();
         }
 
@@ -75,10 +63,6 @@ namespace UTJ.MLAPISample
             MLAPI.NetworkManager.Singleton.OnClientConnectedCallback -= this.OnClientConnect;
             // クライアントが切断された時のコールバック設定
             MLAPI.NetworkManager.Singleton.OnClientDisconnectCallback -= this.OnClientDisconnect;
-            if (this.cachedConnectInfo.useRelay)
-            {
-                MLAPI.Transports.UNET.RelayTransport.OnRemoteEndpointReported -= OnRelayEndPointReported;
-            }
         }
 
         // クライアントが接続してきたときの処理
