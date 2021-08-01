@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace UTJ.MLAPISample
+namespace LANMatching.Sample
 {
     // キャラクターの動きのコントローラー
     public class CharacterMoveController : MLAPI.NetworkBehaviour

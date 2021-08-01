@@ -122,6 +122,12 @@ namespace LANMatching
         #region UNITY_EVENTS
         private void Awake()
         {
+            if (Instance)
+            {
+                GameObject.Destroy(this.gameObject);
+                return;
+            }
+
             Instance = this;
             this.hostRoomInfo = new RoomInfo();
             this.hostRoomInfo.name = SystemInfo.deviceName;
@@ -133,7 +139,10 @@ namespace LANMatching
         private void OnDestroy()
         {
             this.Stop();
-            Instance = null;
+            if (this == Instance)
+            {
+                Instance = null;
+            }
         }
 
         private void Update()

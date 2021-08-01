@@ -11,6 +11,19 @@ namespace LANMatching.Sample
         // Start is called before the first frame update
         void Start()
         {
+#if UNITY_EDITOR
+            if (!NetworkManager.Singleton)
+            {
+                string networkManagerPrefabPath = "Assets/Sample/Prefabs/LANMatching/NetworkManager.prefab";
+                var netMgrPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(networkManagerPrefabPath);
+                GameObject.Instantiate(netMgrPrefab);
+                NetworkManager.Singleton.StartHost();
+                var gmo = GameObject.Instantiate(playerChara,Vector3.zero, Quaternion.identity);
+                gmo.GetComponent<NetworkObject>().Spawn();
+
+                return;
+            }
+#endif
             // ホストなら生成
             if (!NetworkManager.Singleton.IsHost) {
                 return;
@@ -22,7 +35,7 @@ namespace LANMatching.Sample
                 var gmo = GameObject.Instantiate(playerChara,new Vector3( idx * 2-2,3,0),Quaternion.identity);
                 ulong clientId = kvs.Key;
                 gmo.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
-                gmo.GetComponent<UTJ.MLAPISample.CharacterMoveController>().SetPlayerName(kvs.Value);
+                gmo.GetComponent<LANMatching.Sample.CharacterMoveController>().SetPlayerName(kvs.Value);
                 ++idx;
             }
         }

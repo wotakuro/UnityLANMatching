@@ -2,9 +2,9 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
-using UTJ.MLAPISample;
+using LANMatching.Sample;
 
-namespace UTJ.MLAPISample
+namespace LANMatching.Sample
 {
     public class ControllerBehaviour : MonoBehaviour
     {
