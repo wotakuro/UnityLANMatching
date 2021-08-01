@@ -20,9 +20,12 @@ namespace LANMatching.Sample
         private HostRoomInfo roomInfo;
         private RoomSearchUI roomSearchUI;
 
+        private RectTransform rectTransform;
+
         private void Awake()
         {
             button.onClick.AddListener(this.OnClickButton);
+            this.rectTransform = this.GetComponent<RectTransform>();
         }
 
         internal bool IsSameHostRoom(HostRoomInfo info)
@@ -37,6 +40,11 @@ namespace LANMatching.Sample
             roomName.text = info.roomInfo.name;
             currentUserNum.text = info.roomInfo.currentUser.ToString();
             limitUserNum.text = info.roomInfo.capacity.ToString();
+        }
+
+        public void SetPosition(Vector2 pos)
+        {
+            this.rectTransform.anchoredPosition = pos;
         }
 
         private void OnClickButton()

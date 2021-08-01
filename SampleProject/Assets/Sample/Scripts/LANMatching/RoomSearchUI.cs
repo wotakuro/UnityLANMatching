@@ -37,6 +37,7 @@ namespace LANMatching.Sample
         // Start is called before the first frame update
         private void OnEnable()
         {
+            this.roomSelectButtons.Clear();
             LANRoomManager.Instance.OnFindNewRoom = OnFindNewRoom;
             LANRoomManager.Instance.OnChangeRoom = OnChangeNewRoom;
             LANRoomManager.Instance.OnLoseRoom = OnLoseRoom;
@@ -59,6 +60,7 @@ namespace LANMatching.Sample
             var selectBtn = obj.GetComponent<RoomSelectButton>();
             selectBtn.Setup(this,info);
             this.roomSelectButtons.Add(selectBtn);
+            UpdatePositions();
         }
 
         private void OnChangeNewRoom(HostRoomInfo info)
@@ -84,6 +86,17 @@ namespace LANMatching.Sample
                     break;
                 }
             }
+            UpdatePositions();
+        }
+
+        private void UpdatePositions()
+        {
+            int cnt = this.roomSelectButtons.Count;
+            for (int i = 0; i < cnt; ++i)
+            {
+                this.roomSelectButtons[i].SetPosition(new Vector2(0, -5-i * 55));
+            }
+
         }
 
         private void OnBackButton()
@@ -102,12 +115,8 @@ namespace LANMatching.Sample
             transport.ConnectPort = roomInfo.connectPoint.Port;
             transport.ConnectAddress = roomInfo.connectPoint.Address.ToString();
             //            Debug.Log(transport.ConnectAddress);
-            netMgr.OnClientConnectedCallback += OnStartClient;
             netMgr.StartClient();
             this.gameObject.SetActive(false);
-        }
-        void OnStartClient(ulong clientId)
-        {
         }
 
 
