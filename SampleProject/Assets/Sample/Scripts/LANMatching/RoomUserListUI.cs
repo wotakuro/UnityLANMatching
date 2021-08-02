@@ -5,10 +5,16 @@ using UnityEngine.UI;
 
 namespace LANMatching.Sample
 {
+    /// <summary>
+    /// ルームに居るユーザー一覧のUI
+    /// </summary>
     public class RoomUserListUI : MonoBehaviour
     {
+        //　ユーザー　一覧が表示されるScrollView
         [SerializeField]
         private ScrollRect scrollRect;
+
+        //　ユーザー名を表示するようPrefab
         [SerializeField]
         private GameObject userNamePrefab;
 
@@ -22,7 +28,7 @@ namespace LANMatching.Sample
         private List<InstantiatedInfo> sortBuffer = new List<InstantiatedInfo>();
         private List<ulong> buffer = new List<ulong>();
 
-        // Update is called once per frame
+        // Update処理
         void Update()
         {
             // update player
@@ -69,6 +75,8 @@ namespace LANMatching.Sample
             // update Position
             UpdatePosition();
         }
+
+        // プレイヤー名の座標の更新
         private void UpdatePosition()
         {
             sortBuffer.Clear();

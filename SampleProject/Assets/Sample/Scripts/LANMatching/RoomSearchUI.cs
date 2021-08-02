@@ -5,8 +5,12 @@ using UnityEngine.UI;
 
 namespace LANMatching.Sample
 {
+    /// <summary>
+    /// ルームを探す時のUI
+    /// </summary>
     public class RoomSearchUI : MonoBehaviour
     {
+        // ルーム一覧が出るScrollView
         [SerializeField]
         private ScrollRect scrollRect;
         [SerializeField]
@@ -23,26 +27,30 @@ namespace LANMatching.Sample
 
         private List<RoomSelectButton> roomSelectButtons;
 
+        // 初期化処理
         public void Setup(InformationInputUI ui)
         {
             this.inputUI = ui;
         }
 
+        // Awake処理
         private void Awake()
         {
             this.backButton.onClick.AddListener(this.OnBackButton);
             this.roomSelectButtons = new List<RoomSelectButton>();
         }
 
-        // Start is called before the first frame update
+        // OnEnable処理
         private void OnEnable()
         {
             this.roomSelectButtons.Clear();
             LANRoomManager.Instance.OnFindNewRoom = OnFindNewRoom;
-            LANRoomManager.Instance.OnChangeRoom = OnChangeNewRoom;
+            LANRoomManager.Instance.OnChangeRoom = OnChangeRoom;
             LANRoomManager.Instance.OnLoseRoom = OnLoseRoom;
             LANRoomManager.Instance.StartClientThread();
         }
+
+        // OnDisable処理
         private void OnDisable()
         {
             if (LANRoomManager.Instance)
@@ -54,6 +62,7 @@ namespace LANMatching.Sample
             }
         }
 
+        // 新しいルームが見つかった時の処理
         private void OnFindNewRoom(HostRoomInfo info)
         {
             var obj = GameObject.Instantiate(this.selectButtonPrefab, this.scrollRect.transform);
@@ -63,7 +72,8 @@ namespace LANMatching.Sample
             UpdatePositions();
         }
 
-        private void OnChangeNewRoom(HostRoomInfo info)
+        // ルーム情報が変更された時の処理処理
+        private void OnChangeRoom(HostRoomInfo info)
         {
             foreach( var roomBtn in this.roomSelectButtons)
             {
@@ -74,6 +84,7 @@ namespace LANMatching.Sample
             }
         }
 
+        // ルーム情報を見失った時の処理処理
         private void OnLoseRoom(HostRoomInfo info)
         {
             int cnt = this.roomSelectButtons.Count;
@@ -89,6 +100,7 @@ namespace LANMatching.Sample
             UpdatePositions();
         }
 
+        // ルーム情報のUIの位置を更新します
         private void UpdatePositions()
         {
             int cnt = this.roomSelectButtons.Count;
@@ -99,12 +111,14 @@ namespace LANMatching.Sample
 
         }
 
+        // 戻るボタンが押された時の処理
         private void OnBackButton()
         {
             this.gameObject.SetActive(false);
             this.inputUI.gameObject.SetActive(true);
         }
 
+        // ルーム選択時の処理
         internal void OnClickRoomButton(HostRoomInfo roomInfo)
         {
             waitingOtherClientUI.Setup(this.inputUI);

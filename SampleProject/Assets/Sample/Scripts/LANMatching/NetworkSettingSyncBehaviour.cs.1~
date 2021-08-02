@@ -9,32 +9,32 @@ namespace LANMatching.Sample
 {
 
     /// <summary>
-    /// MLAPIã§æ¥ç¶šç›´å¾Œã«ã€è¨­å®šã®åŒæœŸã‚’ã—ã¾ã™
+    /// MLAPI‚ÅÚ‘±’¼Œã‚ÉAİ’è‚Ì“¯Šú‚ğ‚µ‚Ü‚·
     /// </summary>
     [RequireComponent(typeof(NetworkObject))]
     public class NetworkSettingSyncBehaviour : NetworkBehaviour
     {
-        // ç”Ÿæˆã•ã‚ŒãŸã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã¸ã®ã‚¢ã‚¯ã‚»ã‚¹
+        // ¶¬‚³‚ê‚½ƒCƒ“ƒXƒ^ƒ“ƒX‚Ö‚ÌƒAƒNƒZƒX
         public static NetworkSettingSyncBehaviour Instance { get; private set; }
 
-        //ã€€ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã”ã¨ã®åå‰ï¼ˆã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆIDãŒã‚­ãƒ¼)
+        //@ƒvƒŒƒCƒ„[‚²‚Æ‚Ì–¼‘OiƒNƒ‰ƒCƒAƒ“ƒgID‚ªƒL[)
         private Dictionary<ulong, string> playerNames = new Dictionary<ulong, string>();
 
-        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã”ã¨ã®åå‰ã‚’å–å¾—ã—ã¾ã™
+        // ƒvƒŒƒCƒ„[‚²‚Æ‚Ì–¼‘O‚ğæ“¾‚µ‚Ü‚·
         public Dictionary<ulong,string> GetAllPlayers()
         {
             return this.playerNames;
         }
 
 
-        //ã€€Awakeå‡¦ç†
+        //@Awakeˆ—
         public void Awake()
         {
             Instance = this;
             GameObject.DontDestroyOnLoad(this.gameObject);
         }
 
-        //ã€€OnDestroyå‡¦ç†
+        //@OnDestroyˆ—
         private void OnDestroy()
         {
             if (NetworkManager.Singleton)
@@ -44,7 +44,7 @@ namespace LANMatching.Sample
             Instance = null;
         }
 
-        // Startå‡¦ç†
+        // Startˆ—
         private void Start()
         {
             NetworkManager.OnClientDisconnectCallback += OnDisconnectClient;
@@ -52,13 +52,13 @@ namespace LANMatching.Sample
             SetNameServerRpc(InformationInputUI.playerName);
         }
 
-        // åˆ‡æ–­æ™‚ã®å‡¦ç†
+        // Ø’f‚Ìˆ—
         private void OnDisconnectClient(ulong client)
         {
             playerNames.Remove(client);
         }
 
-        // ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆâ†’ãƒ›ã‚¹ãƒˆã«å¯¾ã—ã¦ã€è‡ªåˆ†ã®åå‰ã‚’ä¼ãˆã¾ã™
+        // ƒNƒ‰ƒCƒAƒ“ƒg¨ƒzƒXƒg‚É‘Î‚µ‚ÄA©•ª‚Ì–¼‘O‚ğ“`‚¦‚Ü‚·
         [ServerRpc(Delivery = RpcDelivery.Reliable,RequireOwnership =false)]
         private void SetNameServerRpc(string name ,ServerRpcParams rpcParams=default)
         {
@@ -69,7 +69,7 @@ namespace LANMatching.Sample
             SetNameClientRpc(clientId, name,clientRpc);
         }
 
-        // ãƒ›ã‚¹ãƒˆã«å¯¾ã—ã¦ã€å…¨ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼åˆ†ã®åå‰ã‚’è¦æ±‚ã—ã¾ã™
+        // ƒzƒXƒg‚É‘Î‚µ‚ÄA‘SƒvƒŒƒCƒ„[•ª‚Ì–¼‘O‚ğ—v‹‚µ‚Ü‚·
         [ServerRpc(Delivery = RpcDelivery.Reliable, RequireOwnership = false)]
         private void RequestNamesServerRpc( ServerRpcParams rpcParams = default)
         {
@@ -82,14 +82,14 @@ namespace LANMatching.Sample
             }
         }
 
-        // ãƒ›ã‚¹ãƒˆâ†’ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã§ã€ãƒ›ã‚¹ãƒˆãŒæŒã£ã¦ã„ã‚‹åå‰ã‚’ä¼ãˆã¾ã™
+        // ƒzƒXƒg¨ƒNƒ‰ƒCƒAƒ“ƒg‚ÅAƒzƒXƒg‚ª‚Á‚Ä‚¢‚é–¼‘O‚ğ“`‚¦‚Ü‚·
         [ClientRpc(Delivery = RpcDelivery.Reliable)]
         private void SetNameClientRpc(ulong clientId, string name,ClientRpcParams rpcParams= default)
         {
             SetPlayerName(clientId, name);
         }
 
-        // ãƒ­ãƒ¼ã‚«ãƒ«ä¸Šã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼åè¾æ›¸ã‚’ã‚»ãƒƒãƒˆã—ã¾ã™
+        // ƒ[ƒJƒ‹ã‚ÌƒvƒŒƒCƒ„[–¼«‘‚ğƒZƒbƒg‚µ‚Ü‚·
         private void SetPlayerName(ulong clientId , string name)
         {
             playerNames[clientId] = name;
