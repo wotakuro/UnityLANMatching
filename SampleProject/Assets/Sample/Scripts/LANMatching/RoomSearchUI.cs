@@ -65,7 +65,7 @@ namespace LANMatching.Sample
         // 新しいルームが見つかった時の処理
         private void OnFindNewRoom(HostRoomInfo info)
         {
-            var obj = GameObject.Instantiate(this.selectButtonPrefab, this.scrollRect.transform);
+            var obj = GameObject.Instantiate(this.selectButtonPrefab, this.scrollRect.content);
             var selectBtn = obj.GetComponent<RoomSelectButton>();
             selectBtn.Setup(this,info);
             this.roomSelectButtons.Add(selectBtn);
@@ -109,6 +109,9 @@ namespace LANMatching.Sample
                 this.roomSelectButtons[i].SetPosition(new Vector2(0, -5-i * 55));
             }
 
+            var size = scrollRect.content.sizeDelta;
+            size.y = cnt * 55 + 10;
+            scrollRect.content.sizeDelta = size;
         }
 
         // 戻るボタンが押された時の処理

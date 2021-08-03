@@ -10,9 +10,6 @@ namespace LANMatching.Sample
     /// </summary>
     public class WaitingOtherClientUI : MonoBehaviour
     {
-        // ユーザー 一覧がリストされるScrollView
-        [SerializeField]
-        private ScrollRect scrollRect;
 
         // 戻るボタン
         [SerializeField]

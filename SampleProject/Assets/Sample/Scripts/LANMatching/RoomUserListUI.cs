@@ -91,6 +91,9 @@ namespace LANMatching.Sample
                 obj.rectTransform.anchoredPosition = new Vector2(5, -5 - 30 * idx);
                 ++idx;
             }
+            var size = scrollRect.content.sizeDelta;
+            size.y = sortBuffer.Count * 30 + 10;
+            scrollRect.content.sizeDelta = size;
         }
     }
 }

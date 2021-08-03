@@ -111,6 +111,7 @@ namespace LANMatching
                 {
                     this.recievedRoomDictionary = new Dictionary<EndPoint, HostRoomInfo>();
                 }
+                this.recievedRoomDictionary.Clear();
                 this.status = RunningStatus.SearchRoom;
                 this.executeFlag = true;
                 thread = new Thread(ExecuteSearchRoomThreaded);
@@ -156,6 +157,7 @@ namespace LANMatching
             {
                 keyBuffer = new List<EndPoint>();
             }
+            keyBuffer.Clear();
             lock (this.recievedRoomDictionary)
             {
                 foreach (var kvs in recievedRoomDictionary)
@@ -297,7 +299,10 @@ namespace LANMatching
                 if (!this.recievedRoomDictionary.TryGetValue(endPoint, out info))
                 {
                     info = new HostRoomInfo(ipEndPoint,evt.Buffer,0);
-                    this.recievedRoomDictionary.Add(endPoint, info);
+                    if (info.roomInfo.isOpen)
+                    {
+                        this.recievedRoomDictionary.Add(endPoint, info);
+                    }
                 }
                 else
                 {

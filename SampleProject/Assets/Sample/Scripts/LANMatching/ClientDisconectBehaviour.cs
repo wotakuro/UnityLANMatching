@@ -46,6 +46,7 @@ namespace LANMatching.Sample
             if (netMgr)
             {
                 netMgr.OnClientConnectedCallback += OnClientConnect;
+                netMgr.OnClientDisconnectCallback += OnClientDisconnect;
             }
         }
 
@@ -67,11 +68,28 @@ namespace LANMatching.Sample
             var netMgr = MLAPI.NetworkManager.Singleton;
             if (netMgr && clientId == netMgr.LocalClientId)
             {
-                Debug.Log("OnClientConnect!!");
                 shouldExecute = true;
+                netMgr.OnClientDisconnectCallback -= OnClientDisconnect;
             }
         }
-        
+        // クライアントが切断されたときの処理
+        // StartClientしてタイムアウトした時を想定
+        private void OnClientDisconnect(ulong clientId)
+        {
+            var netMgr = MLAPI.NetworkManager.Singleton;
+            netMgr.OnClientDisconnectCallback -= OnClientDisconnect;
+            this.ExecuteDisconnect();
+        }
+
+        // 自身がDisconnectされたときに行う処理
+        private void ExecuteDisconnect()
+        {
+            var netMgr = MLAPI.NetworkManager.Singleton;
+            SceneManager.LoadScene("LanMatching");
+            shouldExecute = false;
+            netMgr.OnClientDisconnectCallback -= OnClientDisconnect;
+            netMgr.OnClientConnectedCallback -= OnClientConnect;
+        }
 
         // Update処理
         private void Update()
@@ -81,8 +99,7 @@ namespace LANMatching.Sample
             // 切断を検知したら最初のシーンに戻ります
             if (netMgr && !netMgr.IsConnectedClient)
             {
-                SceneManager.LoadScene("LanMatching");
-                shouldExecute = false;
+                ExecuteDisconnect();
             }
         }
     }
