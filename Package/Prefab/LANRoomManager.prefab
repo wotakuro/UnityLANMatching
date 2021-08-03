@@ -44,5 +44,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   udpPacketPort: 9999
-  broadCastSpanMs: 1000
+  broadCastSpanMs: 500
   timeoutMs: 1500
+  method: 0

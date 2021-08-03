@@ -129,6 +129,7 @@ namespace LANMatching.Sample
             transport.ConnectPort = roomInfo.connectPoint.Port;
             transport.ConnectAddress = roomInfo.connectPoint.Address.ToString();
             //            Debug.Log(transport.ConnectAddress);
+            ClientDisconectBehaviour.Instance.SetupBeforeClientStart();
             netMgr.StartClient();
             this.gameObject.SetActive(false);
         }

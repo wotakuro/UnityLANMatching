@@ -5,15 +5,23 @@ using MLAPI;
 
 namespace LANMatching.Sample
 {
+
+    /// <summary>
+    /// マッチングしてシーン遷移後に、操作キャラクターをSpawnします
+    /// </summary>
     public class PlayerCharaSpawner : MonoBehaviour
     {
+        // Network上でSpawnしたいPrefab
+        // NetworkManagerで登録している必要があります
         [SerializeField]
         private GameObject playerChara;
-        // Start is called before the first frame update
 
+
+        // Start処理
         void Start()
         {
-            // Editor実行中に
+            // Editor実行中に、このシーンを開いたときに行われるべき初期化が行われていないので…
+            // 強引に初期化して対処します
 #if UNITY_EDITOR
             if (!NetworkManager.Singleton)
             {
@@ -27,10 +35,11 @@ namespace LANMatching.Sample
                 return;
             }
 #endif
-            // ホストなら生成
+            // ホスト以外は処理しません
             if (!NetworkManager.Singleton.IsHost) {
                 return;
             }
+            // プレイヤー用のオブジェクトをNetworkでSpawnします
             var allPlayer = NetworkSettingSyncBehaviour.Instance.GetAllPlayers();
             int idx = 0;
             foreach( var kvs in allPlayer)
@@ -38,7 +47,8 @@ namespace LANMatching.Sample
                 var gmo = GameObject.Instantiate(playerChara,new Vector3( idx * 2-2,3,0),Quaternion.identity);
                 ulong clientId = kvs.Key;
                 gmo.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
-                gmo.GetComponent<LANMatching.Sample.CharacterMoveController>().SetPlayerName(kvs.Value);
+                // 名前をセットします
+                gmo.GetComponent<CharacterMoveController>().SetPlayerName(kvs.Value);
                 ++idx;
             }
         }

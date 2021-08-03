@@ -38,6 +38,8 @@ namespace LANMatching.Sample
         {
             this.gameObject.SetActive(false);
             this.inputUI.gameObject.SetActive(true);
+
+            ClientDisconectBehaviour.Instance.SetupBeforeClientStop();
             MLAPI.NetworkManager.Singleton.StopClient();
         }
     }
