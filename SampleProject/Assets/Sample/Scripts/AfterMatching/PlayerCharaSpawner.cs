@@ -7,10 +7,13 @@ namespace LANMatching.Sample
 {
     public class PlayerCharaSpawner : MonoBehaviour
     {
-        public GameObject playerChara;
+        [SerializeField]
+        private GameObject playerChara;
         // Start is called before the first frame update
+
         void Start()
         {
+            // Editor実行中に
 #if UNITY_EDITOR
             if (!NetworkManager.Singleton)
             {
