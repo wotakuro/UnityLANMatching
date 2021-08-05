@@ -25,7 +25,7 @@ namespace LANMatching.Sample
 
 
         // ボタンと紐づくHostルーム情報
-        private HostRoomInfo roomInfo;
+        private HostRoomInfo hostRoomInfo;
 
         // ボタン押したときに、処理してほしいことがあるので…ルーム探すUIを保持します
         private RoomSearchUI roomSearchUI;
@@ -43,14 +43,14 @@ namespace LANMatching.Sample
         // 引数に渡されたHostRoomかチェックして返します
         internal bool IsSameHostRoom(HostRoomInfo info)
         {
-            return (roomInfo == info);
+            return (hostRoomInfo == info);
         }
 
         // セットアップ処理
         public void Setup(RoomSearchUI searchUI, HostRoomInfo info)
         {
             this.roomSearchUI = searchUI;
-            this.roomInfo = info;
+            this.hostRoomInfo = info;
             roomName.text = info.roomInfo.name;
             currentUserNum.text = info.roomInfo.currentUser.ToString();
             limitUserNum.text = info.roomInfo.capacity.ToString();
@@ -65,9 +65,10 @@ namespace LANMatching.Sample
         // ボタンが押された時の処理
         private void OnClickButton()
         {
-            if (this.roomSearchUI)
+            if (this.roomSearchUI && this.hostRoomInfo!=null && this.hostRoomInfo.roomInfo != null &&
+                this.hostRoomInfo.roomInfo.currentUser < this.hostRoomInfo.roomInfo.capacity)
             {
-                this.roomSearchUI.OnClickRoomButton(this.roomInfo);
+                this.roomSearchUI.OnClickRoomButton(this.hostRoomInfo);
             }
         }
     }

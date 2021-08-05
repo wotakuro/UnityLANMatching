@@ -69,6 +69,7 @@ namespace LANMatching.Sample
         {
             PlayerPrefs.SetString("PlayerName", this.playerNameField.text);
             PlayerPrefs.SetString("RoomName", this.roomNameField.text);
+            PlayerPrefs.Save();
         }
 
         // ルームを探すを押された時の処理

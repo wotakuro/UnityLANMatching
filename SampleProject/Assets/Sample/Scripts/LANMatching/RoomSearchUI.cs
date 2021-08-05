@@ -122,15 +122,15 @@ namespace LANMatching.Sample
         }
 
         // ルーム選択時の処理
-        internal void OnClickRoomButton(HostRoomInfo roomInfo)
+        internal void OnClickRoomButton(HostRoomInfo hostRoomInfo)
         {
-            waitingOtherClientUI.Setup(this.inputUI);
+            waitingOtherClientUI.Setup(hostRoomInfo.roomInfo, this.inputUI);
             waitingOtherClientUI.gameObject.SetActive(true);
             // Connect to MLAPI
             var netMgr = MLAPI.NetworkManager.Singleton;
             var transport = netMgr.NetworkConfig.NetworkTransport as MLAPI.Transports.UNET.UNetTransport;
-            transport.ConnectPort = roomInfo.connectPoint.Port;
-            transport.ConnectAddress = roomInfo.connectPoint.Address.ToString();
+            transport.ConnectPort = hostRoomInfo.connectPoint.Port;
+            transport.ConnectAddress = hostRoomInfo.connectPoint.Address.ToString();
             //            Debug.Log(transport.ConnectAddress);
             ClientDisconectBehaviour.Instance.SetupBeforeClientStart();
             netMgr.StartClient();

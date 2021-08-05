@@ -15,12 +15,17 @@ namespace LANMatching.Sample
         [SerializeField]
         private Button backButton;
 
+        // ルームの情報UI
+        [SerializeField]
+        private RoomInfoUI roomInfoUI;
+
         // 戻る先のUI
         private InformationInputUI inputUI;
 
         //　初期化処理
-        public void Setup(InformationInputUI ui)
+        public void Setup(RoomInfo roomInfo,InformationInputUI ui)
         {
+            this.roomInfoUI.Setup(roomInfo);
             this.inputUI = ui;
         }
 

@@ -6,6 +6,9 @@ using LANMatching.Sample;
 
 namespace LANMatching.Sample
 {
+    /// <summary>
+    /// コントローラー部分の処理(モバイルではバーチャルパッドなので)
+    /// </summary>
     public class ControllerBehaviour : MonoBehaviour
     {
         private class ButtonListner
@@ -33,53 +36,18 @@ namespace LANMatching.Sample
         private int touchFingerId;
         private bool isEnabled;
 
-        public GameObject virtualPadObject;
+        [SerializeField]
+        private GameObject virtualPadObject;
 
-        public Button[] buttons;
-        public RectTransform lpadPos;
+        [SerializeField]
+        private Button[] buttons;
+        [SerializeField]
+        private RectTransform lpadPos;
 
         // 
         public static ControllerBehaviour Instance
         {
             get { return instance; }
-        }
-        // 初期化時
-        void Awake()
-        {
-            instance = this;
-            this.keys = new KeyCode[]
-            {
-            KeyCode.Alpha1,
-            KeyCode.Alpha2,
-            KeyCode.Alpha3,
-            KeyCode.Alpha4,
-            KeyCode.Alpha5,
-            };
-            this.SetupCallback();
-
-            this.buttonClickedBuffer = new bool[buttons.Length];
-        }
-
-        // ボタンのコールバック処理
-        void SetupCallback()
-        {
-            for (int i = 0; i < buttons.Length; ++i)
-            {
-                var listner = new ButtonListner(this.OnClickBtn, i);
-                buttons[i].onClick.AddListener(listner.Exec);
-            }
-        }
-
-        // ボタンが押された時の処理
-        void OnClickBtn(int idx)
-        {
-            buttonClickedBuffer[idx] = true;
-        }
-
-        // 破棄時の処理
-        private void OnDestroy()
-        {
-            instance = null;
         }
 
         // 左のパッドの入力
@@ -101,18 +69,6 @@ namespace LANMatching.Sample
                 return CalculateActualMoveVector(move);
             }
         }
-        // 斜めに入れたときに移動速度が速くなってしまうので、その対策です
-        private Vector3 CalculateActualMoveVector(Vector3 vec)
-        {
-            float speedValue = 0.0f;
-            speedValue = vec.magnitude;
-            if (speedValue > 1.0f)
-            {
-                vec /= speedValue;
-            }
-            return vec;
-        }
-
 
         // ボタンを押したかどうか( PC 1-5キー、ボタン)
         public bool IsKeyDown(int idx)
@@ -150,6 +106,57 @@ namespace LANMatching.Sample
                 this.isEnabled = false;
                 this.isTouching = false;
             }
+        }
+
+
+        // 初期化時
+        void Awake()
+        {
+            instance = this;
+            this.keys = new KeyCode[]
+            {
+            KeyCode.Alpha1,
+            KeyCode.Alpha2,
+            KeyCode.Alpha3,
+            KeyCode.Alpha4,
+            KeyCode.Alpha5,
+            };
+            this.SetupCallback();
+
+            this.buttonClickedBuffer = new bool[buttons.Length];
+        }
+
+        // ボタンのコールバック処理
+        private void SetupCallback()
+        {
+            for (int i = 0; i < buttons.Length; ++i)
+            {
+                var listner = new ButtonListner(this.OnClickBtn, i);
+                buttons[i].onClick.AddListener(listner.Exec);
+            }
+        }
+
+        // ボタンが押された時の処理
+        private void OnClickBtn(int idx)
+        {
+            buttonClickedBuffer[idx] = true;
+        }
+
+        // 破棄時の処理
+        private void OnDestroy()
+        {
+            instance = null;
+        }
+        // 斜めに入れたときに移動速度が速くなってしまうので、その対策です
+        private Vector3 CalculateActualMoveVector(Vector3 vec)
+        {
+            float speedValue = 0.0f;
+            speedValue = vec.magnitude;
+            if (speedValue > 1.0f)
+            {
+                vec /= speedValue;
+            }
+            return vec;
         }
 
         // 更新処理

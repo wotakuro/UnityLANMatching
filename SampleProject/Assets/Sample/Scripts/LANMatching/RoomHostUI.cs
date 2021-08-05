@@ -16,6 +16,9 @@ namespace LANMatching.Sample
         // 開始ボタン
         [SerializeField]
         private Button startGameButton;
+        // ルームの情報UI
+        [SerializeField]
+        private RoomInfoUI roomInfoUI;
 
         // 開始後にPlayer名などの設定を同期するためのNetworkPrefab
         [SerializeField]
@@ -51,6 +54,7 @@ namespace LANMatching.Sample
         // OnEnable処理
         private void OnEnable()
         {
+            // 設定を取得します
             var mlapiTransport = MLAPI.NetworkManager.Singleton.NetworkConfig.NetworkTransport as MLAPI.Transports.UNET.UNetTransport;
             int port = mlapiTransport.ServerListenPort; ;
             int limitUser= mlapiTransport.MaxConnections;
@@ -58,8 +62,9 @@ namespace LANMatching.Sample
 
             var roomInfo = new RoomInfo(this.roomName,port , (byte)limitUser);
             LANRoomManager.Instance.hostRoomInfo = roomInfo;
-            LANRoomManager.Instance.StartHostThread();
+            roomInfoUI.Setup(roomInfo);
 
+            LANRoomManager.Instance.StartHostThread();
             // Start MLAPI Host
             MLAPI.NetworkManager.Singleton.StartHost();
 
