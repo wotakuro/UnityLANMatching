@@ -1,15 +1,27 @@
 # UnityLANMatching
 UnityのLANのマッチング
 
-## 実行方法について
-
 ## Packageで提供している機能について
 Packageフォルダにあるパッケージでは、「ルームを立てる」「ルームを探す」の二種類の機能があります。<br />
 ルームへの接続後については、全くケアしていません <br />
-（サンプルではMLAPIでプレイヤー名の同期などを行っています）
+（サンプルではMLAPIでプレイヤー名の同期などを行っています）<br >
+<br />
+Broadcastアドレス(255.255.255.255)に対して、UDPパケットでルーム情報を流すことでLAN内でのマッチングを実現しています。
+
 
 ### LANマッチングのセットアップについて
+![Prefab設定](Documentation~/PlacePrefab.png) <br />
+シーン上にPackage内にあるLANRoomManager.prefabを配置してください。
 
+### Prefab設定
+![Prefab設定](Documentation~/LANRoomManagerConfig.png) <br />
+Inspector上でいくつかの項目が設定できます <br />
+■UdpPacketPort<br/>
+Broadcast(255.255.255.255)へルーム情報を流す時のポート番号を指定します<br />
+■BroadCastSpanMs<br/>
+何ミリ秒ごとに情報を流すか設定します。<br />
+■TimeoutMs<br/>
+何ミリ秒の間データを受信しなかったらタイムアウトとみなすか、設定します。<br />
 
 ### ルームを立てる時の処理
 ```
