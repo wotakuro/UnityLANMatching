@@ -8,6 +8,8 @@ Packageフォルダにあるパッケージでは、「ルームを立てる」�
 ルームへの接続後については、全くケアしていません <br />
 （サンプルではMLAPIでプレイヤー名の同期などを行っています）
 
+### LANマッチングのセットアップについて
+
 
 ### ルームを立てる時の処理
 ```
@@ -19,6 +21,8 @@ LANRoomManager.Instance.hostRoomInfo = roomInfo;
 // 募集を開始します
 LANRoomManager.Instance.StartHostThread();
 ```
+
+その後適宜ルームの参加人数を下記のような呼び出しで更新してください
 
 ### ルームを探すときの処理
 ```
