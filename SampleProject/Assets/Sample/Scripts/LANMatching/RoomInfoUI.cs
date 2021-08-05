@@ -6,21 +6,21 @@ using UnityEngine.UI;
 namespace LANMatching.Sample
 {
     /// <summary>
-    /// ƒ‹[ƒ€‚Ìî•ñUI
+    /// ãƒ«ãƒ¼ãƒ ã®æƒ…å ±UI
     /// </summary>
     public class RoomInfoUI : MonoBehaviour
     {
-        // ƒ‹[ƒ€–¼
+        // ãƒ«ãƒ¼ãƒ å
         [SerializeField]
         private Text roomName;
-        // Œ»İ‚Ìƒ†[ƒU[”
+        // ç¾åœ¨ã®ãƒ¦ãƒ¼ã‚¶ãƒ¼æ•°
         [SerializeField]
         private Text currentUser;
-        // Å‘ål”
+        // æœ€å¤§äººæ•°
         [SerializeField]
         private Text limitUser;
 
-        // ƒZƒbƒgƒAƒbƒvˆ—
+        // ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—å‡¦ç†
         public void Setup(RoomInfo roomInfo)
         {
             this.roomName.text = roomInfo.name;
@@ -28,7 +28,7 @@ namespace LANMatching.Sample
             this.limitUser.text = roomInfo.capacity.ToString();
         }
 
-        // XVˆ—
+        // æ›´æ–°å‡¦ç†
         private void Update()
         {
             if (!NetworkSettingSyncBehaviour.Instance)
