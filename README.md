@@ -71,13 +71,13 @@ LANRoomManager.Instance.Stop();
 
 ## サンプルプロジェクトについて
 サンプルでは、下記のようにキャラクターの位置が同期するデモになっています<br />
-・ローカルPCでの動作
+### ローカルPCでの動作
 ![サンプル](Documentation~/localPCDemo.gif) <br />
-・複数台での動作
+### 複数台での動作
 ![サンプル](Documentation~/MatchingDemo.gif) <br />
 
 <br />
 ルームが見つかったら接続はMLAPIで行っています。<br />
 
-
-![詳細](AboutSampleProject.md) <br />
+サンプルプロジェクトの解説等については、別途ドキュメントにしました<br />
+[こちらのドキュメント](AboutSampleProject.ja.md)をご参照ください<br />
