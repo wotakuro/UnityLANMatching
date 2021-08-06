@@ -80,4 +80,4 @@ LANRoomManager.Instance.Stop();
 ルームが見つかったら接続はMLAPIで行っています。<br />
 
 サンプルプロジェクトの解説等については、別途ドキュメントにしました<br />
-[こちらのドキュメント](AboutSampleProject.ja.md)をご参照ください<br />
+[こちらのドキュメント](AboutSampleProject.md)をご参照ください<br />
